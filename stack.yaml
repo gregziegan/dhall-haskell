@@ -2,6 +2,7 @@ resolver: lts-13.30
 packages:
   - dhall
   - dhall-bash
+  - dhall-graphql
   - dhall-json
   - dhall-nix
   - dhall-lsp-server

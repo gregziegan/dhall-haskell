@@ -1,0 +1,12 @@
+type User {
+  name: String!
+}
+
+type Repo {
+  name: String!
+  owner: User!
+}
+
+type Query {
+  users: [User]
+}

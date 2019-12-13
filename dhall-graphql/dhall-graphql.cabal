@@ -1,0 +1,109 @@
+Name: dhall-graphql
+Version: 1.0.0
+Cabal-Version: >=1.8.0.2
+Build-Type: Simple
+Tested-With: GHC == 7.10.3, GHC == 8.4.3, GHC == 8.6.1
+License: BSD3
+License-File: LICENSE
+Copyright: 2019 Greg Ziegan
+Author: Greg Ziegan
+Maintainer: greg.ziegan@gmail.com
+Bug-Reports: https://github.com/dhall-lang/dhall-haskell/issues
+Synopsis: Convert between Dhall and GraphQL
+Description:
+    Use this package if you want to convert between Dhall expressions and GraphQL SDL.
+    You can use this package as a library or an executable:
+    .
+    * See the "Dhall.Graphql" module if you want to use this package as a library
+    .
+    * Use the @dhall-to-graphql@ program from this package if
+      you want an executable
+    .
+    The "Dhall.GraphQL" module also contains instructions for how to use this
+    package
+Category: Compiler
+Extra-Source-Files:
+    CHANGELOG.md
+    tasty/data/*.dhall
+
+Source-Repository head
+    Type: git
+    Location: https://github.com/dhall-lang/dhall-haskell/tree/master/dhall-graphql
+
+Library
+    Hs-Source-Dirs: src
+    Build-Depends:
+        base                      >= 4.8.0.0  && < 5   ,
+        bytestring                               < 0.11,
+        containers                                     ,
+        dhall                     >= 1.28.0   && < 1.29,
+        exceptions                >= 0.8.3    && < 0.11,
+        filepath                                 < 1.5 ,
+        optparse-applicative      >= 0.14.0.0 && < 0.16,
+        prettyprinter             >= 1.5.1    && < 1.6 ,
+        scientific                >= 0.3.0.0  && < 0.4 ,
+        text                      >= 0.11.1.0 && < 1.3 ,
+        unordered-containers                     < 0.3 ,
+        vector
+    Exposed-Modules:
+        Dhall.GraphQL
+        Dhall.GraphQLToDhall
+    GHC-Options: -Wall
+
+Executable dhall-to-graphql
+    Hs-Source-Dirs: dhall-to-graphql
+    Main-Is: Main.hs
+    Build-Depends:
+        base                                   ,
+        bytestring                       < 0.11,
+        dhall                                  ,
+        dhall-graphql                          ,
+        optparse-applicative                   ,
+        text
+    Other-Modules:
+        Paths_dhall_graphql
+    GHC-Options: -Wall
+
+Executable dhall-to-yaml
+    Hs-Source-Dirs: dhall-to-yaml
+    Main-Is: Main.hs
+    Build-Depends:
+        base      ,
+        dhall-graphql
+    Other-Modules:
+        Paths_dhall_graphql
+    GHC-Options: -Wall
+
+Executable graphql-to-dhall
+    Hs-Source-Dirs: graphql-to-dhall
+    Main-Is: Main.hs
+    Build-Depends:
+        base                                             ,
+        ansi-terminal               >= 0.6.3.1  && < 0.11,
+        bytestring                                 < 0.11,
+        dhall                                            ,
+        dhall-graphql                                    ,
+        exceptions                  >= 0.8.3    && < 0.11,
+        optparse-applicative                             ,
+        prettyprinter                                    ,
+        prettyprinter-ansi-terminal >= 1.1.1    && < 1.2 ,
+        text                                       < 1.3
+    if !impl(ghc >= 8.0) && !impl(eta >= 0.8.4)
+      Build-Depends: semigroups == 0.18.*
+    Other-Modules:
+        Paths_dhall_graphql
+    GHC-Options: -Wall
+
+Test-Suite tasty
+    Type: exitcode-stdio-1.0
+    Hs-Source-Dirs: tasty
+    Main-Is: Main.hs
+    Build-Depends:
+        base              ,
+        bytestring        ,
+        dhall             ,
+        dhall-graphql        ,
+        tasty       <  1.3,
+        text              ,
+        tasty-hunit >= 0.2
+    GHC-Options: -Wall
