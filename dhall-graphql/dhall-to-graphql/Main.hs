@@ -7,7 +7,6 @@ import           Control.Applicative            ( (<|>)
                                                 , optional
                                                 )
 import           Control.Exception              ( SomeException )
-import           Data.Aeson                     ( Value )
 import           Data.Monoid                    ( (<>) )
 import           Data.Version                   ( showVersion )
 import           Options.Applicative            ( Parser
@@ -15,11 +14,10 @@ import           Options.Applicative            ( Parser
                                                 )
 
 import qualified Control.Exception
-import qualified Data.Aeson
-import qualified Data.Aeson.Encode.Pretty
 import qualified Data.ByteString.Lazy
 import qualified Data.Text.IO                  as Text.IO
 import qualified Dhall
+import qualified Dhall.GraphQL                  ( dhallToGraphQL )
 import qualified GHC.IO.Encoding
 import qualified Options.Applicative           as Options
 import qualified System.Exit
@@ -28,7 +26,6 @@ import qualified System.IO
 data Options
     = Options
         { explain                   :: Bool
-        , omission                  :: Value -> Value
         , file                      :: Maybe FilePath
         , output                    :: Maybe FilePath
         }
@@ -80,29 +77,17 @@ main = do
 
     Options {..} -> do
       handle $ do
-        let
-          config = Data.Aeson.Encode.Pretty.Config
-            { Data.Aeson.Encode.Pretty.confIndent          =
-              Data.Aeson.Encode.Pretty.Spaces 2
-            , Data.Aeson.Encode.Pretty.confCompare         = compare
-            , Data.Aeson.Encode.Pretty.confNumFormat       =
-              Data.Aeson.Encode.Pretty.Generic
-            , Data.Aeson.Encode.Pretty.confTrailingNewline = False
-            }
         let explaining = if explain then Dhall.detailed else id
 
         text <- case file of
           Nothing   -> Text.IO.getContents
           Just path -> Text.IO.readFile path
 
-        graphql <- omission <$> explaining
-          (Dhall.GraphQL.codeToValue conversion specialDoubleMode file text)
-
         let write = case output of
               Nothing    -> Data.ByteString.Lazy.putStr
               Just file_ -> Data.ByteString.Lazy.writeFile file_
 
-        write (encode graphql <> "\n")
+        write (encode dhallToGraphQL <> "\n")
 
 handle :: IO a -> IO a
 handle = Control.Exception.handle handler
